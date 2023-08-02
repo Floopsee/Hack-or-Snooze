@@ -1,73 +1,50 @@
 "use strict";
 
-// So we don't have to keep re-finding things on the page, find DOM elements once:
-
 const $body = $("body");
 const $storiesLoadingMsg = $("#stories-loading-msg");
 const $allStoriesList = $("#all-stories-list");
+const $favoritedStories = $("#favorited-stories");
+const $ownStories = $("#my-stories");
+const $storiesContainer = $("#stories-container");
+
+const $storiesLists = $(".stories-list");
+
 const $loginForm = $("#login-form");
 const $signupForm = $("#signup-form");
+
+const $submitForm = $("#submit-form");
+
+const $navSubmitStory = $("#nav-submit-story");
 const $navLogin = $("#nav-login");
 const $navUserProfile = $("#nav-user-profile");
 const $navLogOut = $("#nav-logout");
 
-/** To make it easier for individual components to show just themselves, this
- * is a useful function that hides pretty much everything on the page. After
- * calling this, individual components can re-show just what they want.
- */
+const $userProfile = $("#user-profile");
+
 function hidePageComponents() {
-  const components = [$allStoriesList, $loginForm, $signupForm];
+  const components = [
+    $storiesLists,
+    $submitForm,
+    $loginForm,
+    $signupForm,
+    $userProfile,
+  ];
   components.forEach((c) => c.hide());
 }
 
-/** Overall function to kick off the app. */
 async function start() {
   console.debug("start");
 
-  try {
-    await checkForRememberedUser();
-    await getAndShowStoriesOnStart();
+  await checkForRememberedUser();
+  await getAndShowStoriesOnStart();
 
-    if (currentUser) updateUIOnUserLogin();
-  } catch (error) {
-    console.error("Error in starting the app:", error);
-  }
+  if (currentUser) updateUIOnUserLogin();
 }
 
+console.warn(
+  "HEY STUDENT: This program sends many debug messages to" +
+    " the console. If you don't see the message 'start' below this, you're not" +
+    " seeing those helpful debug messages. In your browser console, click on" +
+    " menu 'Default Levels' and add Verbose"
+);
 $(start);
-
-/** Show main list of all stories when click site name */
-function navAllStories(evt) {
-  console.debug("navAllStories", evt);
-  hidePageComponents();
-
-  try {
-    putStoriesOnPage();
-  } catch (error) {
-    console.error("Error in showing all stories:", error);
-    alert("Failed to load stories. Please try again later.");
-  }
-}
-
-$body.on("click", "#nav-all", navAllStories);
-
-/** Show login/signup on click on "login" */
-function navLoginClick(evt) {
-  console.debug("navLoginClick", evt);
-  hidePageComponents();
-  $loginForm.show();
-  $signupForm.show();
-}
-
-$navLogin.on("click", navLoginClick);
-
-/** When a user first logs in, update the navbar to reflect that. */
-function updateNavOnLogin() {
-  console.debug("updateNavOnLogin");
-  $(".main-nav-links").show();
-  $navLogin.hide();
-  $navLogOut.show();
-  $navUserProfile.text(`${currentUser.username}`).show();
-}
-
-// Remaining code for getAndShowStoriesOnStart, putStoriesOnPage, and user login/signup/login are unchanged.
